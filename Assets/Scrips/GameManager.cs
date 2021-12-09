@@ -3,9 +3,11 @@ using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
+    public static GameObject LocalPlayer;
     public static GameManager instance;
     string gameVersion = "1";
 
@@ -27,6 +29,18 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.ConnectUsingSettings();
         PhotonNetwork.GameVersion = gameVersion;
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if(!PhotonNetwork.InRoom)
+        {
+            return;
+        }
+        LocalPlayer = PhotonNetwork.Instantiate("TankPlayer", new Vector3(0, 0, 0), Quaternion.identity, 0);
+        Debug.Log("Player Instance ID: " + LocalPlayer.GetInstanceID());
     }
     public override void OnConnected()
     {
@@ -65,4 +79,5 @@ public class GameManager : MonoBehaviourPunCallbacks
             Debug.Log("Joined room!!");
         }
     }
+
 }
